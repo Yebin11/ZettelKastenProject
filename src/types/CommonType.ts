@@ -2,8 +2,12 @@ namespace CommonType {
     export type RootStackParamList = {
         Home: undefined;
         Manage: undefined;
-        Note: undefined;
-        InFolder: undefined;
+        Note: {
+            folderKey: string;
+        };
+        InFolder: {
+            folderKey: string;
+        };
         LinkCheck: undefined;
         LinkManage: undefined;
         Graph: undefined;
@@ -11,7 +15,7 @@ namespace CommonType {
         Setting: undefined;
     };
 
-    export type FolderValue = {
+    export type FolderKeyValue = {
         key: string;
         value: {
             title: string;
@@ -19,11 +23,24 @@ namespace CommonType {
         };
     }
 
-    export type NoteValue = {
+    export type NoteKeyValue = {
         key: string;
-        title: string;
-        createdDate: Date;
-        modifiedDate: Date;
-        tags: string[];
+        value: {
+            title: string;
+            text: string;
+            createdDate: Date;
+            modifiedDate: Date;
+            tags: string[];
+        };
     };
+
+    export type FolderItemProps = {
+        id: string;
+        item: FolderKeyValue;
+    }
+
+    export type NoteItemProps = {
+        id: string;
+        item: NoteKeyValue;
+    }
 }

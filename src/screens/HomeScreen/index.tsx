@@ -1,57 +1,61 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { Button, FlatList, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { getFolder, getFolderAllKeys, setFolder } from "../../storage/storage";
+import { getFolder, getFolderAllKeys, getNoteAllKeys, setFolder } from "../../storage/storage";
+import { noteStorage } from "../../../App";
 
 export type HomeScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Home">;
 
 const HomeScreen = ({route, navigation} : HomeScreenProps) => {
-    const [titleModalVisible, setTitleModalVisible] = useState<boolean>(false);
-    const [title, setTitle] = useState('');
+    const [folderTitleModalVisible, setFolderTitleModalVisible] = useState<boolean>(false);
+    const [folderTitle, setFolderTitle] = useState('');
+    const [refresh, setRefresh] = useState<boolean>(false);
     let folderKeys: string[] = [];
-    const homeFolder: CommonType.FolderValue = {
+    const homeFolder: CommonType.FolderKeyValue = {
         key: '0',
         value: {
             title: 'Home',
             noteList: [],
         },
     };
-    const childFolders: CommonType.FolderValue[] = [];
+    const childFolders: CommonType.FolderKeyValue[] = [];
 
     const onChangeFolderTitle = (inputTitle: string) => {
-        setTitle(inputTitle);
+        setFolderTitle(inputTitle);
     };
 
     const onPressSaveMakeFolder = () => {
-        setTitleModalVisible(false);
-
+        setFolderTitleModalVisible(false);
         makeNewFolder();
+
+        setRefresh(!refresh);
     };
 
     const onPressCancelMakeFolder = () => {
-        setTitleModalVisible(false);
+        setFolderTitleModalVisible(false);
+        
+        setRefresh(!refresh);
     };
 
     const onPressMakeFolder = () => {
-        setTitleModalVisible(true);
+        setFolderTitleModalVisible(true);
     };
 
     const makeNewFolder = () => {
-        const newFolder: CommonType.FolderValue = {} as CommonType.FolderValue;
+        const newFolder: CommonType.FolderKeyValue = {} as CommonType.FolderKeyValue;
 
         loadFolderKeys();
 
         const lastKey = parseInt(folderKeys.slice(-1)[0]);
         const tempFolderKey = (lastKey + 1).toString();
-
-        if(newFolder?.key) newFolder.key = '';
-        // if(newFolder?.value?.title) newFolder.value.title = {};
-        // nested object property
+        const tempFolderValue = {
+            title: folderTitle,
+            noteList: [],
+        }
 
         newFolder.key = tempFolderKey;
-        newFolder.value.title = title;
-        newFolder.value.noteList = [];
+        newFolder.value = tempFolderValue;
 
         setFolder(tempFolderKey, newFolder);
     };
@@ -64,7 +68,7 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
     };
 
     const loadFolders = () => {
-        const tempHomeFolder: CommonType.FolderValue = getFolder(folderKeys[0]);
+        const tempHomeFolder: CommonType.FolderKeyValue = getFolder(folderKeys[0]);
         homeFolder.value.noteList = [...tempHomeFolder.value.noteList];
 
         childFolders.length = 0;
@@ -74,6 +78,20 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         }
     };
 
+    const FolderItem = ({id, item} : CommonType.FolderItemProps) => (
+        <View>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('InFolder', {folderKey: id})}
+            >
+                <Text>{item.value.title}</Text>
+            </TouchableOpacity>
+        </View>
+    )
+
+    const renderFolder = useCallback(({item} : {item : CommonType.FolderKeyValue}) => (
+        <FolderItem id={item.key} item={item}/>
+    ), []);
+    
     useEffect(() => {
         if(!getFolderAllKeys().length){
             homeFolder.value.noteList.length = 0;
@@ -83,36 +101,31 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         loadFolderKeys();
         loadFolders();
 
-    }, []);
+        console.log('home useEffect');
+
+        //console.log(getNoteAllKeys());
+        //console.log(getFolder('1'));
+
+    }, [refresh]);
 
     return (
         <View>
             <FlatList
                 data={childFolders}
-                renderItem={({item}) => {
-                    return (
-                        <View>
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('InFolder')}
-                            >
-                                <Text>{item.value.title}</Text>
-                            </TouchableOpacity>
-                        </View>
-                    )
-                }}
+                keyExtractor={(item) => item.key}
+                renderItem={renderFolder}
             >
-
             </FlatList>
             <View>
                 <Modal
                     animationType="slide"
-                    visible={titleModalVisible}
-                    transparent={true}
+                    visible={folderTitleModalVisible}
+                    transparent={false}
                 >
                     <View>
                         <TextInput
                             onChangeText={onChangeFolderTitle}
-                            value={title}
+                            value={folderTitle}
                             placeholder="폴더 제목"
                         />
                         <TouchableOpacity
