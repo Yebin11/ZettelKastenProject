@@ -11,6 +11,11 @@ export const setNote = (key: string, value: CommonType.NoteKeyValue) => {
     console.log(`setNote ${key}`);
 };
 
+export const delNote = (key: string) => {
+    noteStorage.delete(key);
+    console.log(`delNote ${key}`);
+};
+
 export const getNoteAllKeys = () => {
     const keys = noteStorage.getAllKeys();
     return keys;
@@ -25,6 +30,11 @@ export const setFolder = (key: string, value: CommonType.FolderKeyValue) => {
     const jsonValue = JSON.stringify(value);
     folderStorage.set(key, jsonValue);
     console.log(`setFolder ${key}`);
+};
+
+export const delFolder = (key: string) => {
+    folderStorage.delete(key);
+    console.log(`delFolder ${key}`);
 };
 
 export const getFolderAllKeys = () => {

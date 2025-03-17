@@ -18,11 +18,11 @@ const InFolderScreen = ({route, navigation} : InFolderScreenProps) => {
     };
 
     const loadNotesInFolder = () => {
-        const CurFolderNoteList = getFolder(curFolderKey).value.noteList;
+        const curFolderNoteList = getFolder(curFolderKey).value.noteList;
     
         notesInCurFolder.length = 0;
         for(const idx in noteKeys){
-            if(CurFolderNoteList.includes(noteKeys[idx])){
+            if(curFolderNoteList.includes(noteKeys[idx])){
                 const tempNote = getNote(noteKeys[idx]);
                 notesInCurFolder.push(JSON.parse(JSON.stringify(tempNote)));
             }
@@ -32,7 +32,7 @@ const InFolderScreen = ({route, navigation} : InFolderScreenProps) => {
     const NoteItem = ({id, item}: CommonType.NoteItemProps) => (
         <View>
             <TouchableOpacity
-                onPress={() => navigation.navigate('Note', {folderKey: route.params.folderKey})}
+                onPress={() => navigation.navigate('Note', {noteKey: id, folderKey: route.params.folderKey})}
             >
                 <Text>{item.value.title}</Text>
             </TouchableOpacity>
@@ -61,7 +61,7 @@ const InFolderScreen = ({route, navigation} : InFolderScreenProps) => {
             </FlatList>
             <Button
                 title="노트 생성"
-                onPress={() => navigation.navigate('Note', {folderKey: route.params.folderKey})}
+                onPress={() => navigation.navigate('Note', {noteKey: '', folderKey: route.params.folderKey})}
             />
         </View>
     );

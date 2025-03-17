@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { Button, FlatList, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { getFolder, getFolderAllKeys, getNoteAllKeys, setFolder } from "../../storage/storage";
+import { getFolder, getFolderAllKeys, getNote, getNoteAllKeys, setFolder } from "../../storage/storage";
 import { noteStorage } from "../../../App";
 
 export type HomeScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Home">;
@@ -20,6 +20,8 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         },
     };
     const childFolders: CommonType.FolderKeyValue[] = [];
+    const notesInHomeFolder: CommonType.NoteKeyValue[] = [];
+    let noteKeys: string[] = [];
 
     const onChangeFolderTitle = (inputTitle: string) => {
         setFolderTitle(inputTitle);
@@ -27,6 +29,7 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
 
     const onPressSaveMakeFolder = () => {
         setFolderTitleModalVisible(false);
+        setFolderTitle('');
         makeNewFolder();
 
         setRefresh(!refresh);
@@ -34,7 +37,8 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
 
     const onPressCancelMakeFolder = () => {
         setFolderTitleModalVisible(false);
-        
+        setFolderTitle('');
+
         setRefresh(!refresh);
     };
 
@@ -91,7 +95,40 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
     const renderFolder = useCallback(({item} : {item : CommonType.FolderKeyValue}) => (
         <FolderItem id={item.key} item={item}/>
     ), []);
+
+    const loadNoteKeys = () => {
+        noteKeys = getNoteAllKeys();
+        noteKeys.sort((a, b) => {
+            return parseInt(a, 10) - parseInt(b, 10);
+        });
+    };
     
+    const loadNotesHomeFolder = () => {
+        const homeFolderNoteList = getFolder(homeFolder.key).value.noteList;
+    
+        notesInHomeFolder.length = 0;
+        for(const idx in noteKeys){
+            if(homeFolderNoteList.includes(noteKeys[idx])){
+                const tempNote = getNote(noteKeys[idx]);
+                notesInHomeFolder.push(JSON.parse(JSON.stringify(tempNote)));
+            }
+        }
+    };
+
+    const NoteItem = ({id, item}: CommonType.NoteItemProps) => (
+        <View>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('Note', {noteKey: id, folderKey: homeFolder.key})}
+            >
+                <Text>{item.value.title}</Text>
+            </TouchableOpacity>
+        </View>
+    );
+
+    const renderNotesInFolder = useCallback(({item} : {item : CommonType.NoteKeyValue}) => (
+            <NoteItem id={item.key} item={item}/>
+    ), []);
+
     useEffect(() => {
         if(!getFolderAllKeys().length){
             homeFolder.value.noteList.length = 0;
@@ -101,10 +138,14 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         loadFolderKeys();
         loadFolders();
 
+        loadNoteKeys();
+        loadNotesHomeFolder();
+
         console.log('home useEffect');
 
         //console.log(getNoteAllKeys());
         //console.log(getFolder('1'));
+        //noteStorage.clearAll();
 
     }, [refresh]);
 
@@ -146,6 +187,17 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
                 title="폴더 생성"
                 onPress={onPressMakeFolder}
             />
+            <Button
+                title="노트 생성"
+                onPress={() => navigation.navigate('Note', {noteKey: '', folderKey: '0'})}
+            />
+
+            <FlatList
+                data={notesInHomeFolder}
+                keyExtractor={(item) => item.key}
+                renderItem={renderNotesInFolder}
+            >
+            </FlatList>
         </View>
     );
 }

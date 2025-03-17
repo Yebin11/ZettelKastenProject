@@ -3,6 +3,7 @@ namespace CommonType {
         Home: undefined;
         Manage: undefined;
         Note: {
+            noteKey: string;
             folderKey: string;
         };
         InFolder: {
@@ -28,8 +29,8 @@ namespace CommonType {
         value: {
             title: string;
             text: string;
-            createdDate: Date;
-            modifiedDate: Date;
+            createdDate: string;
+            modifiedDate: string;
             tags: string[];
         };
     };
