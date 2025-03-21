@@ -1,18 +1,18 @@
 import React, { useCallback } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
-import { FolderListProp } from "../../types/ListPropType";
+import { FolderDataWithEditable, FolderListProp } from "../../types/ListPropType";
 import * as CommonType from "../../types/CommonType";
 
-const FolderList = ({ParentScreenProps, childFolders, editable, onPressEditFolder} : FolderListProp) => {
-    const FolderItem = ({id, item} : CommonType.FolderItemProps) => (
+const FolderList = ({ParentScreenProps, folderDataWithEditable, onPressEditFolder} : FolderListProp) => {
+    const FolderItem = ({item} : {item : FolderDataWithEditable}) => (
         <View>
             <Pressable
-                disabled={editable}
+                disabled={item.editable}
                 onPress={() => {
-                    ParentScreenProps.navigation.navigate('InFolder', {folderKey: id})
+                    ParentScreenProps.navigation.navigate('InFolder', {folderKey: item.childFolder.key})
                 }}
             >
-                <Text>{item.value.title}</Text>
+                <Text>{item.childFolder.value.title}</Text>
             </Pressable>
 
             <Pressable
@@ -21,27 +21,27 @@ const FolderList = ({ParentScreenProps, childFolders, editable, onPressEditFolde
                         backgroundColor: pressed ? 'rgb(100, 100, 100)' : 'white',
                     },
                 ]}
-                disabled={!editable}
-                onPress={() => onPressEditFolder(id)}
+                disabled={!(item.editable)}
+                onPress={() => onPressEditFolder(item.childFolder.key)}
             >
                 <Text>폴더 편집</Text>
             </Pressable>
         </View>
     );
 
-    const renderFolder = useCallback(({item} : {item : CommonType.FolderKeyValue}) => {
-        console.log(editable);
+    const renderFolder = useCallback(({item} : {item : FolderDataWithEditable}) => {
+        console.log(item.editable);
 
         return(
-            <FolderItem id={item.key} item={item}/>
+            <FolderItem item={item}/>
         );
     }, []);
 
     return (
         <>
             <FlatList
-                data={childFolders}
-                keyExtractor={(item) => item.key}
+                data={folderDataWithEditable}
+                keyExtractor={(item) => item.childFolder.key}
                 renderItem={renderFolder}
             ></FlatList>
         </>

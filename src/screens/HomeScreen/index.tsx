@@ -7,6 +7,7 @@ import * as CommonType from "../../types/CommonType";
 import { folderStorage, noteStorage } from "../../../App";
 import FolderList from "./FolderList";
 import EditPressable from "./EditPressable";
+import { FolderDataWithEditable } from "../../types/ListPropType";
 
 export type HomeScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Home">;
 
@@ -28,6 +29,8 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
 
     const [editable, setEditable] = useState<boolean>(false);
     const [folderTitleEditModalVisible, setFolderTitleEditModalVisible] = useState<boolean>(false);
+
+    const childFolderData: FolderDataWithEditable[] = [];
 
     const onChangeFolderTitle = (inputTitle: string) => {
         setFolderTitle(inputTitle);
@@ -202,6 +205,18 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         setEditable(tmp);
     };
 
+    const makeChildFolderData = () => {
+        const tempFolders = childFolders.map((f) => {
+            const tempFolderData = {
+                childFolder: f,
+                editable: editable,
+            };
+            return tempFolderData;
+        });
+
+        return tempFolders;
+    }
+
     useEffect(() => {
         if(!getFolderAllKeys().length){
             homeFolder.value.noteList.length = 0;
@@ -214,11 +229,18 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         loadNoteKeys();
         loadNotesHomeFolder();
 
+        const tmp = makeChildFolderData();
+        childFolderData.length = 0;
+        tmp.map(f => childFolderData.push(f));
+
+        console.log(childFolderData);
+
         console.log('home useEffect'); 
 
-        updateState();
+        //updateState();
 
         //console.log(getNoteAllKeys());
+        //console.log(getFolderAllKeys());
         //console.log(getFolder('1'));
         //noteStorage.clearAll();
 
@@ -228,8 +250,7 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         <View>
             <FolderList
                 ParentScreenProps={{route, navigation}}
-                childFolders={childFolders}
-                editable={editable}
+                folderDataWithEditable={childFolderData}
                 onPressEditFolder={onPressEditFolder}
             >
             </FolderList>
