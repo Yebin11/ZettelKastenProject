@@ -1,9 +1,12 @@
 import React, { useCallback, useEffect } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { Button, FlatList, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { getFolder, getFolderAllKeys, getNote, getNoteAllKeys, setFolder } from "../../storage/storage";
-import { noteStorage } from "../../../App";
+import { Button, FlatList, Modal, Pressable, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { delFolder, delNote, getFolder, getFolderAllKeys, getNote, getNoteAllKeys, setFolder } from "../../storage/Storage";
+import * as CommonType from "../../types/CommonType";
+import { folderStorage, noteStorage } from "../../../App";
+import FolderList from "./FolderList";
+import EditPressable from "./EditPressable";
 
 export type HomeScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Home">;
 
@@ -22,6 +25,9 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
     const childFolders: CommonType.FolderKeyValue[] = [];
     const notesInHomeFolder: CommonType.NoteKeyValue[] = [];
     let noteKeys: string[] = [];
+
+    const [editable, setEditable] = useState<boolean>(false);
+    const [folderTitleEditModalVisible, setFolderTitleEditModalVisible] = useState<boolean>(false);
 
     const onChangeFolderTitle = (inputTitle: string) => {
         setFolderTitle(inputTitle);
@@ -82,20 +88,6 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         }
     };
 
-    const FolderItem = ({id, item} : CommonType.FolderItemProps) => (
-        <View>
-            <TouchableOpacity
-                onPress={() => navigation.navigate('InFolder', {folderKey: id})}
-            >
-                <Text>{item.value.title}</Text>
-            </TouchableOpacity>
-        </View>
-    )
-
-    const renderFolder = useCallback(({item} : {item : CommonType.FolderKeyValue}) => (
-        <FolderItem id={item.key} item={item}/>
-    ), []);
-
     const loadNoteKeys = () => {
         noteKeys = getNoteAllKeys();
         noteKeys.sort((a, b) => {
@@ -110,7 +102,7 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         for(const idx in noteKeys){
             if(homeFolderNoteList.includes(noteKeys[idx])){
                 const tempNote = getNote(noteKeys[idx]);
-                notesInHomeFolder.push(JSON.parse(JSON.stringify(tempNote)));
+                notesInHomeFolder.push(tempNote);
             }
         }
     };
@@ -125,9 +117,90 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         </View>
     );
 
-    const renderNotesInFolder = useCallback(({item} : {item : CommonType.NoteKeyValue}) => (
-            <NoteItem id={item.key} item={item}/>
-    ), []);
+    const renderNotesHomeFolder = ({item} : {item : CommonType.NoteKeyValue}) => (
+        <NoteItem id={item.key} item={item}/>
+    )
+
+    const onPressEditFolder = (id: string) => {
+        //setFolderTitleEditModalVisible(true);
+
+        console.log('onPressEditFolder');
+
+        setRefresh(!refresh);
+    };
+
+    const EditFolderModal = ({id = '0'}) => {
+        if(id == '0') return;
+        const editingFolder = getFolder(id);
+
+        return (
+            <Modal
+                animationType="slide"
+                visible={folderTitleEditModalVisible}
+                transparent={false}
+            >
+                <View>
+                    <TextInput
+                        onChangeText={onChangeFolderTitle}
+                        value="임시"
+                        placeholder="새 폴더 제목"
+                    />
+                    <TouchableOpacity
+                        onPress={() => onPressDeleteFolder(editingFolder)}
+                    >
+                        <Text>삭제</Text>
+                    </TouchableOpacity>
+                    <View>
+                        <TouchableOpacity
+                            onPress={() => onPressSaveEditFolder(id, editingFolder.value.title)}
+                        >
+                            <Text>저장</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={onPressCancelEditFolder}
+                        >
+                            <Text>취소</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        );
+    };
+
+    const onPressDeleteFolder = (item: CommonType.FolderKeyValue) => {
+        setFolderTitleEditModalVisible(false);
+        item.value.noteList.map((noteKey) => delNote(noteKey));
+        delFolder(item.key);
+        
+        setRefresh(!refresh);
+    };
+
+    const onPressSaveEditFolder = (id: string, newTitle: string) => {
+        const tempFolder = getFolder(id);
+        tempFolder.value.title = newTitle;
+        setFolderTitleEditModalVisible(false);
+        setFolder(id, tempFolder);
+
+        setRefresh(!refresh);
+    }
+
+    const onPressCancelEditFolder = () => {
+        setFolderTitleEditModalVisible(false);
+        setFolderTitle('');
+
+        setRefresh(!refresh);
+    }
+
+    const onPressSwitchEditable = () => {
+        setEditable(!editable);
+
+        setRefresh(!refresh);
+    }
+
+    const updateState = () => {
+        const tmp = editable;
+        setEditable(tmp);
+    };
 
     useEffect(() => {
         if(!getFolderAllKeys().length){
@@ -141,7 +214,9 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         loadNoteKeys();
         loadNotesHomeFolder();
 
-        console.log('home useEffect');
+        console.log('home useEffect'); 
+
+        updateState();
 
         //console.log(getNoteAllKeys());
         //console.log(getFolder('1'));
@@ -151,12 +226,14 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
 
     return (
         <View>
-            <FlatList
-                data={childFolders}
-                keyExtractor={(item) => item.key}
-                renderItem={renderFolder}
+            <FolderList
+                ParentScreenProps={{route, navigation}}
+                childFolders={childFolders}
+                editable={editable}
+                onPressEditFolder={onPressEditFolder}
             >
-            </FlatList>
+            </FolderList>
+            
             <View>
                 <Modal
                     animationType="slide"
@@ -195,9 +272,14 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
             <FlatList
                 data={notesInHomeFolder}
                 keyExtractor={(item) => item.key}
-                renderItem={renderNotesInFolder}
+                renderItem={renderNotesHomeFolder}
             >
             </FlatList>
+
+            <EditPressable
+                updateFunc={onPressSwitchEditable}
+            >
+            </EditPressable>
         </View>
     );
 }

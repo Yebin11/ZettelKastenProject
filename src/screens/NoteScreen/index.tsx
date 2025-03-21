@@ -1,7 +1,8 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
 import { Button, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { delNote, getFolder, getNote, getNoteAllKeys, setFolder, setNote } from "../../storage/storage";
+import { delNote, getFolder, getNote, getNoteAllKeys, setFolder, setNote } from "../../storage/Storage";
+import * as CommonType from "../../types/CommonType";
 import noteStyles from "./styles";
 
 export type NoteScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Note">;

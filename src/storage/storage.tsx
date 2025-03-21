@@ -1,11 +1,12 @@
 import { noteStorage, folderStorage } from "../../App";
+import { FolderKeyValue, NoteKeyValue } from "../types/CommonType";
 
 export const getNote = (key: string) => {
     const res = noteStorage.getString(key);
     return res != null ? JSON.parse(res) : null;
 };
 
-export const setNote = (key: string, value: CommonType.NoteKeyValue) => {
+export const setNote = (key: string, value: NoteKeyValue) => {
     const jsonValue = JSON.stringify(value);
     noteStorage.set(key, jsonValue);
     console.log(`setNote ${key}`);
@@ -26,7 +27,7 @@ export const getFolder = (key: string) => {
     return res != null ? JSON.parse(res) : null;
 };
 
-export const setFolder = (key: string, value: CommonType.FolderKeyValue) => {
+export const setFolder = (key: string, value: FolderKeyValue) => {
     const jsonValue = JSON.stringify(value);
     folderStorage.set(key, jsonValue);
     console.log(`setFolder ${key}`);
