@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { Button, FlatList, Modal, Pressable, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Button, FlatList, Modal, Pressable, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { delFolder, delNote, getFolder, getFolderAllKeys, getNote, getNoteAllKeys, setFolder } from "../../storage/Storage";
 import * as CommonType from "../../types/CommonType";
 import { folderStorage, noteStorage } from "../../../App";
 import FolderList from "./FolderList";
 import EditPressable from "./EditPressable";
 import { FolderDataWithEditable } from "../../types/ListPropType";
+import EditFolderModal from "./EditFolderModal";
 
 export type HomeScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Home">;
 
@@ -30,7 +31,8 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
     const [editable, setEditable] = useState<boolean>(false);
     const [folderTitleEditModalVisible, setFolderTitleEditModalVisible] = useState<boolean>(false);
 
-    const childFolderData: FolderDataWithEditable[] = [];
+    const childFoldersData: FolderDataWithEditable[] = [];
+    const [editingFolderKey, setEditingFolderKey] = useState('');
 
     const onChangeFolderTitle = (inputTitle: string) => {
         setFolderTitle(inputTitle);
@@ -125,74 +127,11 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
     )
 
     const onPressEditFolder = (id: string) => {
-        //setFolderTitleEditModalVisible(true);
-
-        console.log('onPressEditFolder');
+        setEditingFolderKey(id);
+        setFolderTitleEditModalVisible(true);
 
         setRefresh(!refresh);
     };
-
-    const EditFolderModal = ({id = '0'}) => {
-        if(id == '0') return;
-        const editingFolder = getFolder(id);
-
-        return (
-            <Modal
-                animationType="slide"
-                visible={folderTitleEditModalVisible}
-                transparent={false}
-            >
-                <View>
-                    <TextInput
-                        onChangeText={onChangeFolderTitle}
-                        value="임시"
-                        placeholder="새 폴더 제목"
-                    />
-                    <TouchableOpacity
-                        onPress={() => onPressDeleteFolder(editingFolder)}
-                    >
-                        <Text>삭제</Text>
-                    </TouchableOpacity>
-                    <View>
-                        <TouchableOpacity
-                            onPress={() => onPressSaveEditFolder(id, editingFolder.value.title)}
-                        >
-                            <Text>저장</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={onPressCancelEditFolder}
-                        >
-                            <Text>취소</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-        );
-    };
-
-    const onPressDeleteFolder = (item: CommonType.FolderKeyValue) => {
-        setFolderTitleEditModalVisible(false);
-        item.value.noteList.map((noteKey) => delNote(noteKey));
-        delFolder(item.key);
-        
-        setRefresh(!refresh);
-    };
-
-    const onPressSaveEditFolder = (id: string, newTitle: string) => {
-        const tempFolder = getFolder(id);
-        tempFolder.value.title = newTitle;
-        setFolderTitleEditModalVisible(false);
-        setFolder(id, tempFolder);
-
-        setRefresh(!refresh);
-    }
-
-    const onPressCancelEditFolder = () => {
-        setFolderTitleEditModalVisible(false);
-        setFolderTitle('');
-
-        setRefresh(!refresh);
-    }
 
     const onPressSwitchEditable = () => {
         setEditable(!editable);
@@ -200,12 +139,7 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         setRefresh(!refresh);
     }
 
-    const updateState = () => {
-        const tmp = editable;
-        setEditable(tmp);
-    };
-
-    const makeChildFolderData = () => {
+    const makeChildFoldersData = () => {
         const tempFolders = childFolders.map((f) => {
             const tempFolderData = {
                 childFolder: f,
@@ -214,7 +148,16 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
             return tempFolderData;
         });
 
-        return tempFolders;
+        childFoldersData.length = 0;
+        tempFolders.map(f => childFoldersData.push(f));
+    }
+
+    const folderTitleEditModalOff = () => {
+        setFolderTitleEditModalVisible(false);
+    }
+
+    const switchRefresh = () => {
+        setRefresh(!refresh);
     }
 
     useEffect(() => {
@@ -229,15 +172,11 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         loadNoteKeys();
         loadNotesHomeFolder();
 
-        const tmp = makeChildFolderData();
-        childFolderData.length = 0;
-        tmp.map(f => childFolderData.push(f));
+        makeChildFoldersData();
 
-        console.log(childFolderData);
+        console.log(childFoldersData);
 
         console.log('home useEffect'); 
-
-        //updateState();
 
         //console.log(getNoteAllKeys());
         //console.log(getFolderAllKeys());
@@ -250,7 +189,7 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         <View>
             <FolderList
                 ParentScreenProps={{route, navigation}}
-                folderDataWithEditable={childFolderData}
+                folderDataWithEditable={childFoldersData}
                 onPressEditFolder={onPressEditFolder}
             >
             </FolderList>
@@ -280,6 +219,14 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
                     </View>
                 </Modal>
             </View>
+
+            <EditFolderModal
+                id={editingFolderKey}
+                visible={folderTitleEditModalVisible}
+                modalOffFunc={folderTitleEditModalOff}
+                refreshFunc={switchRefresh}
+            >
+            </EditFolderModal>
 
             <Button
                 title="폴더 생성"
