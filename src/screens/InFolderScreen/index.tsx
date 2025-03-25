@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, Button, TouchableOpacity, FlatList } from "react-native";
-import { getFolder, getNote, getNoteAllKeys } from "../../storage/Storage";
+import { getFolder, getNote, getNoteAllKeys } from "../../storage/storage";
 import * as CommonType from "../../types/CommonType";
 
 export type InFolderScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "InFolder">;

@@ -4,3 +4,10 @@ export type EditFolderModalProp = {
     modalOffFunc: () => void;
     refreshFunc: () => void;
 };
+
+export type MoveFolderModalProp = {
+    noteKeyList: string[];
+    visible: boolean;
+    modalOffFunc: () => void;
+    refreshFunc: () => void;
+}

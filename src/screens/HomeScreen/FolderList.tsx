@@ -1,7 +1,6 @@
 import React, { useCallback } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { FolderDataWithEditable, FolderListProp } from "../../types/ListPropType";
-import * as CommonType from "../../types/CommonType";
 
 const FolderList = ({ParentScreenProps, folderDataWithEditable, onPressEditFolder} : FolderListProp) => {
     const FolderItem = ({item} : {item : FolderDataWithEditable}) => (

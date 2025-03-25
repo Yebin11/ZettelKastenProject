@@ -2,13 +2,14 @@ import React, { useCallback, useEffect } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { Button, FlatList, Modal, Pressable, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { delFolder, delNote, getFolder, getFolderAllKeys, getNote, getNoteAllKeys, setFolder } from "../../storage/Storage";
+import { delFolder, delNote, getFolder, getFolderAllKeys, getNote, getNoteAllKeys, setFolder } from "../../storage/storage";
 import * as CommonType from "../../types/CommonType";
 import { folderStorage, noteStorage } from "../../../App";
 import FolderList from "./FolderList";
 import EditPressable from "./EditPressable";
-import { FolderDataWithEditable } from "../../types/ListPropType";
+import { FolderDataWithEditable, HomeNoteDataWithEditable } from "../../types/ListPropType";
 import EditFolderModal from "./EditFolderModal";
+import HomeNoteList from "./HomeNoteList";
 
 export type HomeScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Home">;
 
@@ -33,6 +34,9 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
 
     const childFoldersData: FolderDataWithEditable[] = [];
     const [editingFolderKey, setEditingFolderKey] = useState('');
+
+    const childNotesData: HomeNoteDataWithEditable[] = [];
+    const checkedNotesKey: string[] = [];
 
     const onChangeFolderTitle = (inputTitle: string) => {
         setFolderTitle(inputTitle);
@@ -160,6 +164,33 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         setRefresh(!refresh);
     }
 
+    const makeChildNotesData = () => {
+        const tempNotes = notesInHomeFolder.map((n) => {
+            const tempNoteData = {
+                childNote: n,
+                editable: editable,
+            };
+            return tempNoteData;
+        });
+
+        childNotesData.length = 0;
+        tempNotes.map(n => childNotesData.push(n));
+    }
+
+    const onPressCheckNote = (id: string, check: boolean) => {
+        console.log(id, check);
+
+        if(check && !checkedNotesKey.includes(id)){ //체크 시 배열에 없으면
+            checkedNotesKey.push(id);
+        } else if(!check && checkedNotesKey.includes(id)) { //체크 해제 시 배열에 있으면
+            const tempNotesKey = checkedNotesKey.filter((n) => n !== id);
+            checkedNotesKey.length = 0;
+            tempNotesKey.map(n => checkedNotesKey.push(n));
+        }
+
+        console.log(checkedNotesKey);
+    }
+
     useEffect(() => {
         if(!getFolderAllKeys().length){
             homeFolder.value.noteList.length = 0;
@@ -173,8 +204,9 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         loadNotesHomeFolder();
 
         makeChildFoldersData();
+        makeChildNotesData();
 
-        console.log(childFoldersData);
+        console.log(notesInHomeFolder);
 
         console.log('home useEffect'); 
 
@@ -237,12 +269,13 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
                 onPress={() => navigation.navigate('Note', {noteKey: '', folderKey: '0'})}
             />
 
-            <FlatList
-                data={notesInHomeFolder}
-                keyExtractor={(item) => item.key}
-                renderItem={renderNotesHomeFolder}
+            <HomeNoteList
+                ParentScreenProps={{route, navigation}}
+                parentFolderKey={homeFolder.key}
+                noteDataWithEditable={childNotesData}
+                onPressCheckNote={onPressCheckNote}
             >
-            </FlatList>
+            </HomeNoteList>
 
             <EditPressable
                 updateFunc={onPressSwitchEditable}
