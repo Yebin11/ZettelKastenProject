@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
-import { Button, FlatList, Modal, Pressable, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { delFolder, delNote, getFolder, getFolderAllKeys, getNote, getNoteAllKeys, setFolder } from "../../storage/storage";
+import { Alert, Button, FlatList, Modal, Pressable, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { delFolder, delNote, getFolder, getFolderAllKeys, getNote, getNoteAllKeys, setFolder } from "../../Manager/Storage/storage";
 import * as CommonType from "../../types/CommonType";
 import { folderStorage, noteStorage } from "../../../App";
 import FolderList from "./FolderList";
@@ -37,6 +37,9 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
 
     const childNotesData: HomeNoteDataWithEditable[] = [];
     const checkedNotesKey: string[] = [];
+
+    const [moveFolderModalVisible, setMoveFolderModalVisible] = useState<boolean>(false);
+
 
     const onChangeFolderTitle = (inputTitle: string) => {
         setFolderTitle(inputTitle);
@@ -116,20 +119,6 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         }
     };
 
-    const NoteItem = ({id, item}: CommonType.NoteItemProps) => (
-        <View>
-            <TouchableOpacity
-                onPress={() => navigation.navigate('Note', {noteKey: id, folderKey: homeFolder.key})}
-            >
-                <Text>{item.value.title}</Text>
-            </TouchableOpacity>
-        </View>
-    );
-
-    const renderNotesHomeFolder = ({item} : {item : CommonType.NoteKeyValue}) => (
-        <NoteItem id={item.key} item={item}/>
-    )
-
     const onPressEditFolder = (id: string) => {
         setEditingFolderKey(id);
         setFolderTitleEditModalVisible(true);
@@ -189,6 +178,30 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         }
 
         console.log(checkedNotesKey);
+    }
+
+    const onPressMoveFolder = () => {
+        setMoveFolderModalVisible(true);
+    }
+
+    const onPressCheckNoteDelete = () => {
+        Alert.alert('정말 삭제하시겠습니까?', '선택한 노트가 모두 삭제됩니다.', [
+            {
+                text: '네',
+                onPress: deleteCheckNote
+            },
+            {
+                text: '아니오',
+                onPress: () => console.log('Note Delete Cancel'),
+                style: 'cancel'
+            }
+        ])
+    }
+
+    const deleteCheckNote = () => {
+        console.log(checkedNotesKey);
+
+        checkedNotesKey.map((noteKey) => delNote(noteKey));
     }
 
     useEffect(() => {
@@ -281,6 +294,15 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
                 updateFunc={onPressSwitchEditable}
             >
             </EditPressable>
+
+            <Button
+                title="폴더 이동"
+                onPress={onPressMoveFolder}
+            />
+            <Button
+                title="한번에 삭제"
+                onPress={onPressCheckNoteDelete}
+            />
         </View>
     );
 }

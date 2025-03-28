@@ -1,4 +1,5 @@
 import { HomeScreenProps } from "../screens/HomeScreen";
+import { InFolderScreenProps } from "../screens/InFolderScreen";
 import { FolderKeyValue, NoteKeyValue } from "./CommonType";
 
 export type FolderListProp = {
@@ -12,14 +13,14 @@ export type FolderDataWithEditable = {
     editable: boolean;
 }
 
-export type HomeNoteListProp = {
-    ParentScreenProps: HomeScreenProps;
+export type NoteListProp = {
+    ParentScreenProps: HomeScreenProps | InFolderScreenProps;
     parentFolderKey: string;
-    noteDataWithEditable: HomeNoteDataWithEditable[];
+    noteDataWithEditable: NoteDataWithEditable[];
     onPressCheckNote: Function;
 };
 
-export type HomeNoteDataWithEditable = {
+export type NoteDataWithEditable = {
     childNote: NoteKeyValue;
     editable: boolean;
 }

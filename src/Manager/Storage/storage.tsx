@@ -1,5 +1,5 @@
-import { noteStorage, folderStorage } from "../../App";
-import { FolderKeyValue, NoteKeyValue } from "../types/CommonType";
+import { noteStorage, folderStorage } from "../../../App";
+import { FolderKeyValue, NoteKeyValue } from "../../types/CommonType";
 
 export const getNote = (key: string) => {
     const res = noteStorage.getString(key);

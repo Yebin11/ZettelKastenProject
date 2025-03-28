@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { delFolder, delNote, getFolder, setFolder } from "../../storage/storage";
+import { delFolder, delNote, getFolder, setFolder } from "../../Manager/Storage/storage";
 import { FolderKeyValue } from "../../types/CommonType";
 import { EditFolderModalProp } from "../../types/modalType";
 
