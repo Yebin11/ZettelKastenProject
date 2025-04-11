@@ -4,11 +4,9 @@ import { View, Text, Button, TouchableOpacity, FlatList } from "react-native";
 import { getFolder, getNote, getNoteAllKeys } from "../../storage/storage";
 import * as CommonType from "../../types/CommonType";
 
-export type InFolderScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "InFolder">;
-
-const InFolderScreen = ({route, navigation} : InFolderScreenProps) => {
-    const notesInCurFolder: CommonType.NoteKeyValue[] = [];
-    let noteKeys: string[] = [];
+const InFolderScreen = ({route, navigation}) => {
+    const notesInCurFolder = [];
+    let noteKeys = [];
     const curFolderKey = route.params.folderKey;
 
     const loadNoteKeys = () => {
@@ -30,7 +28,7 @@ const InFolderScreen = ({route, navigation} : InFolderScreenProps) => {
         }
     };
 
-    const NoteItem = ({id, item}: CommonType.NoteItemProps) => (
+    const NoteItem = ({id, item}) => (
         <View>
             <TouchableOpacity
                 onPress={() => navigation.navigate('Note', {noteKey: id, folderKey: route.params.folderKey})}
@@ -40,7 +38,7 @@ const InFolderScreen = ({route, navigation} : InFolderScreenProps) => {
         </View>
     );
 
-    const renderNotesInFolder = useCallback(({item} : {item : CommonType.NoteKeyValue}) => (
+    const renderNotesInFolder = useCallback(({item}) => (
             <NoteItem id={item.key} item={item}/>
     ), []);
 

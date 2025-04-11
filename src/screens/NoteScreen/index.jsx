@@ -2,13 +2,10 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
 import { Button, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { delNote, getFolder, getNote, getNoteAllKeys, setFolder, setNote } from "../../storage/storage";
-import * as CommonType from "../../types/CommonType";
 import noteStyles from "./styles";
 
-export type NoteScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Note">;
-
-const NoteScreen = ({route, navigation} : NoteScreenProps) => {
-    const [curNoteKeyValue, setCurNoteKeyValue] = useState<CommonType.NoteKeyValue>({
+const NoteScreen = ({route, navigation}) => {
+    const [curNoteKeyValue, setCurNoteKeyValue] = useState({
         key: route.params.noteKey,
         value: {
             title: '',
@@ -21,9 +18,9 @@ const NoteScreen = ({route, navigation} : NoteScreenProps) => {
     const [longTags, setLongTags] = useState('');
     const [editable, setEditable] = useState(false);
     const curFolderKey = route.params.folderKey;
-    let noteKeys: string[] = [];
+    let noteKeys = [];
 
-    const handleCurNoteChange = (key: string, value: string | string[]) => {
+    const handleCurNoteChange = (key, value) => {
         setCurNoteKeyValue((prevState) => ({
             ...prevState,
             value: {
@@ -108,7 +105,7 @@ const NoteScreen = ({route, navigation} : NoteScreenProps) => {
         return curNoteKeyValue.value.tags.map(tag => `#${tag}`).join(' ');
     };
 
-    const updateFolder = (save: boolean) => {
+    const updateFolder = (save) => {
         loadNoteKeys();
         const curFolder = getFolder(curFolderKey);
 
@@ -116,7 +113,7 @@ const NoteScreen = ({route, navigation} : NoteScreenProps) => {
             curFolder.value.noteList.push(noteKeys.slice(-1)[0]);
             setFolder(curFolderKey, curFolder);
         } else { //del
-            curFolder.value.noteList = curFolder.value.noteList.filter((e: string) => e != curNoteKeyValue.key);
+            curFolder.value.noteList = curFolder.value.noteList.filter((e) => e != curNoteKeyValue.key);
             setFolder(curFolderKey, curFolder);
         }
     };

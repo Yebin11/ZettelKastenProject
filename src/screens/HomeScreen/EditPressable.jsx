@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, Text } from "react-native";
 
-const EditPressable = ({updateFunc} : {updateFunc : Function}) => {
+const EditPressable = ({updateFunc}) => {
     const updateEditable = () => {
         updateFunc();
     };

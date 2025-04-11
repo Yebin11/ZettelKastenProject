@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { FlatList, Modal, View } from "react-native";
-import { MoveFolderModalProp } from "../../types/modalType";
 import { getFolder, getFolderAllKeys } from "../../storage/storage";
-import { FolderKeyValue } from "../../types/CommonType";
 import MoveFolderList from "./MoveFolderList";
 
-const MoveFolderModal = ({allFolders = [], visible = false, moveFolderSelect}: MoveFolderModalProp) => {
+const MoveFolderModal = ({allFolders = [], visible = false, moveFolderSelect}) => {
     return (
         <Modal
             animationType="slide"

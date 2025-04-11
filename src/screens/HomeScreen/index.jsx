@@ -3,46 +3,42 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useState } from "react";
 import { Button, FlatList, Modal, Pressable, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { delFolder, delNote, getFolder, getFolderAllKeys, getNote, getNoteAllKeys, setFolder } from "../../storage/storage";
-import * as CommonType from "../../types/CommonType";
 import { folderStorage, noteStorage } from "../../../App";
 import FolderList from "./FolderList";
 import EditPressable from "./EditPressable";
-import { FolderDataWithEditable, HomeNoteDataWithEditable } from "../../types/ListPropType";
 import EditFolderModal from "./EditFolderModal";
 import HomeNoteList from "./HomeNoteList";
 import MoveFolderModal from "./MoveFolderModal";
 
-export type HomeScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Home">;
-
-const HomeScreen = ({route, navigation} : HomeScreenProps) => {
-    const [folderTitleModalVisible, setFolderTitleModalVisible] = useState<boolean>(false);
+const HomeScreen = ({route, navigation}) => {
+    const [folderTitleModalVisible, setFolderTitleModalVisible] = useState(false);
     const [folderTitle, setFolderTitle] = useState('');
-    const [refresh, setRefresh] = useState<boolean>(false);
-    let folderKeys: string[] = [];
-    const homeFolder: CommonType.FolderKeyValue = {
+    const [refresh, setRefresh] = useState(false);
+    let folderKeys = [];
+    const homeFolder = {
         key: '0',
         value: {
             title: 'Home',
             noteList: [],
         },
     };
-    const childFolders: CommonType.FolderKeyValue[] = [];
-    const notesInHomeFolder: CommonType.NoteKeyValue[] = [];
-    let noteKeys: string[] = [];
+    const childFolders = [];
+    const notesInHomeFolder = [];
+    let noteKeys = [];
 
-    const [editable, setEditable] = useState<boolean>(false);
-    const [folderTitleEditModalVisible, setFolderTitleEditModalVisible] = useState<boolean>(false);
+    const [editable, setEditable] = useState(false);
+    const [folderTitleEditModalVisible, setFolderTitleEditModalVisible] = useState(false);
 
-    const childFoldersData: FolderDataWithEditable[] = [];
+    const childFoldersData = [];
     const [editingFolderKey, setEditingFolderKey] = useState('');
 
-    const childNotesData: HomeNoteDataWithEditable[] = [];
-    const checkedNotesKey: string[] = [];
+    const childNotesData = [];
+    const checkedNotesKey = [];
 
-    const [moveFolderModalVisible, setMoveFolderModalVisible] = useState<boolean>(false);
-    const allFolders: CommonType.FolderKeyValue[] = [];
+    const [moveFolderModalVisible, setMoveFolderModalVisible] = useState(false);
+    const allFolders = [];
 
-    const onChangeFolderTitle = (inputTitle: string) => {
+    const onChangeFolderTitle = (inputTitle) => {
         setFolderTitle(inputTitle);
     };
 
@@ -66,7 +62,7 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
     };
 
     const makeNewFolder = () => {
-        const newFolder: CommonType.FolderKeyValue = {} as CommonType.FolderKeyValue;
+        const newFolder = {};
 
         loadFolderKeys();
 
@@ -91,7 +87,7 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
     };
 
     const loadFolders = () => {
-        const tempHomeFolder: CommonType.FolderKeyValue = getFolder(folderKeys[0]);
+        const tempHomeFolder = getFolder(folderKeys[0]);
         homeFolder.value.noteList = [...tempHomeFolder.value.noteList];
 
         childFolders.length = 0;
@@ -124,7 +120,7 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         }
     };
 
-    const NoteItem = ({id, item}: CommonType.NoteItemProps) => (
+    const NoteItem = ({id, item}) => (
         <View>
             <TouchableOpacity
                 onPress={() => navigation.navigate('Note', {noteKey: id, folderKey: homeFolder.key})}
@@ -134,11 +130,11 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         </View>
     );
 
-    const renderNotesHomeFolder = ({item} : {item : CommonType.NoteKeyValue}) => (
+    const renderNotesHomeFolder = ({item}) => (
         <NoteItem id={item.key} item={item}/>
     )
 
-    const onPressEditFolder = (id: string) => {
+    const onPressEditFolder = (id) => {
         setEditingFolderKey(id);
         setFolderTitleEditModalVisible(true);
 
@@ -185,7 +181,7 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         tempNotes.map(n => childNotesData.push(n));
     }
 
-    const onPressCheckNote = (id: string, check: boolean) => {
+    const onPressCheckNote = (id, check) => {
         console.log(id, check);
 
         if(check && !checkedNotesKey.includes(id)){ //체크 시 배열에 없으면
@@ -199,7 +195,7 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         console.log(checkedNotesKey);
     }
 
-    const moveFolderSelect = (folderKey: string) => {
+    const moveFolderSelect = (folderKey) => {
         setMoveFolderModalVisible(false);
         
     }

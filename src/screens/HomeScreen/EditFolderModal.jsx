@@ -1,20 +1,18 @@
 import React, { useState } from "react";
 import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { delFolder, delNote, getFolder, setFolder } from "../../storage/storage";
-import { FolderKeyValue } from "../../types/CommonType";
-import { EditFolderModalProp } from "../../types/modalType";
 
-const EditFolderModal = ({id = '', visible = false, modalOffFunc, refreshFunc}: EditFolderModalProp) => {
+const EditFolderModal = ({id = '', visible = false, modalOffFunc, refreshFunc}) => {
     const editingFolder = getFolder(id);
     const [editingFolderTitle, setEditingFolderTitle] = useState('');
 
     if(id == '') return;
 
-    const onChangeEditingFolderTitle = (inputTitle: string) => {
+    const onChangeEditingFolderTitle = (inputTitle) => {
         setEditingFolderTitle(inputTitle);
     }
 
-    const onPressDeleteFolder = (item: FolderKeyValue) => {
+    const onPressDeleteFolder = (item) => {
         modalOffFunc();
         item.value.noteList.map((noteKey) => delNote(noteKey));
         delFolder(item.key);
@@ -22,7 +20,7 @@ const EditFolderModal = ({id = '', visible = false, modalOffFunc, refreshFunc}: 
         resetEditFolderModal()
     };
 
-    const onPressSaveEditFolder = (id: string, newTitle: string) => {
+    const onPressSaveEditFolder = (id, newTitle) => {
         modalOffFunc();
 
         const tempFolder = getFolder(id);

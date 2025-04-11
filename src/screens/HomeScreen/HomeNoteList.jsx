@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { HomeNoteDataWithEditable, HomeNoteListProp } from "../../types/ListPropType";
 import { FlatList, Pressable, Text, View } from "react-native";
 
-const HomeNoteList = ({ParentScreenProps, parentFolderKey, noteDataWithEditable, onPressCheckNote} : HomeNoteListProp) => {
-    const HomeNoteItem = ({item} : {item: HomeNoteDataWithEditable}) => {
+const HomeNoteList = ({ParentScreenProps, parentFolderKey, noteDataWithEditable, onPressCheckNote}) => {
+    const HomeNoteItem = ({item}) => {
         const [checked, setChecked] = useState<boolean>(false);
         
         const onPressCheck = () => {
@@ -40,7 +39,7 @@ const HomeNoteList = ({ParentScreenProps, parentFolderKey, noteDataWithEditable,
         );
     }
 
-    const renderNotesHomeFolder = useCallback(({item} : {item: HomeNoteDataWithEditable}) => {
+    const renderNotesHomeFolder = useCallback(({item}) => {
         return (
             <HomeNoteItem item={item}/>
         );

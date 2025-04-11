@@ -1,9 +1,8 @@
 import React, { useCallback } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
-import { FolderDataWithEditable, FolderListProp } from "../../types/ListPropType";
 
-const FolderList = ({ParentScreenProps, folderDataWithEditable, onPressEditFolder} : FolderListProp) => {
-    const FolderItem = ({item} : {item : FolderDataWithEditable}) => (
+const FolderList = ({ParentScreenProps, folderDataWithEditable, onPressEditFolder}) => {
+    const FolderItem = ({item}) => (
         <View>
             <Pressable
                 disabled={item.editable}
@@ -28,7 +27,7 @@ const FolderList = ({ParentScreenProps, folderDataWithEditable, onPressEditFolde
         </View>
     );
 
-    const renderFolder = useCallback(({item} : {item : FolderDataWithEditable}) => {
+    const renderFolder = useCallback(({item}) => {
         console.log(item.editable);
 
         return(
