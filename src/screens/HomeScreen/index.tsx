@@ -10,6 +10,7 @@ import EditPressable from "./EditPressable";
 import { FolderDataWithEditable, HomeNoteDataWithEditable } from "../../types/ListPropType";
 import EditFolderModal from "./EditFolderModal";
 import HomeNoteList from "./HomeNoteList";
+import MoveFolderModal from "./MoveFolderModal";
 
 export type HomeScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Home">;
 
@@ -37,6 +38,9 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
 
     const childNotesData: HomeNoteDataWithEditable[] = [];
     const checkedNotesKey: string[] = [];
+
+    const [moveFolderModalVisible, setMoveFolderModalVisible] = useState<boolean>(false);
+    const allFolders: CommonType.FolderKeyValue[] = [];
 
     const onChangeFolderTitle = (inputTitle: string) => {
         setFolderTitle(inputTitle);
@@ -95,6 +99,10 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
             const tempChildFolder = getFolder(folderKeys[idx]);
             childFolders.push({key: folderKeys[idx], ...tempChildFolder});
         }
+
+        allFolders.length = 0;
+        allFolders.concat(homeFolder);
+        allFolders.concat(childFolders);
     };
 
     const loadNoteKeys = () => {
@@ -191,6 +199,11 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         console.log(checkedNotesKey);
     }
 
+    const moveFolderSelect = (folderKey: string) => {
+        setMoveFolderModalVisible(false);
+        
+    }
+
     useEffect(() => {
         if(!getFolderAllKeys().length){
             homeFolder.value.noteList.length = 0;
@@ -276,6 +289,13 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
                 onPressCheckNote={onPressCheckNote}
             >
             </HomeNoteList>
+
+            <MoveFolderModal
+                allFolders={allFolders}
+                visible={moveFolderModalVisible}
+                moveFolderSelect={moveFolderSelect}
+            >
+            </MoveFolderModal>
 
             <EditPressable
                 updateFunc={onPressSwitchEditable}

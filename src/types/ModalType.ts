@@ -1,3 +1,5 @@
+import { FolderKeyValue } from "./CommonType";
+
 export type EditFolderModalProp = {
     id: string;
     visible: boolean;
@@ -6,8 +8,7 @@ export type EditFolderModalProp = {
 };
 
 export type MoveFolderModalProp = {
-    noteKeyList: string[];
+    allFolders: FolderKeyValue[];
     visible: boolean;
-    modalOffFunc: () => void;
-    refreshFunc: () => void;
+    moveFolderSelect: Function;
 }
