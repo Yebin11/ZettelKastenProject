@@ -3,7 +3,7 @@ import { FlatList, Pressable, Text, View } from "react-native";
 
 const HomeNoteList = ({ParentScreenProps, parentFolderKey, noteDataWithEditable, onPressCheckNote}) => {
     const HomeNoteItem = ({item}) => {
-        const [checked, setChecked] = useState<boolean>(false);
+        const [checked, setChecked] = useState(false);
         
         const onPressCheck = () => {
             setChecked(!checked);
