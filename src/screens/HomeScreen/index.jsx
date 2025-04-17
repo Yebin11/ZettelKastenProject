@@ -9,6 +9,8 @@ import EditPressable from "./EditPressable";
 import EditFolderModal from "./EditFolderModal";
 import HomeNoteList from "./HomeNoteList";
 import MoveFolderModal from "./MoveFolderModal";
+import MoveFolderList from "./MoveFolderList";
+import { useEvent } from "react-native-reanimated";
 
 const HomeScreen = ({route, navigation}) => {
     const [folderTitleModalVisible, setFolderTitleModalVisible] = useState(false);
@@ -33,10 +35,11 @@ const HomeScreen = ({route, navigation}) => {
     const [editingFolderKey, setEditingFolderKey] = useState('');
 
     const childNotesData = [];
-    const checkedNotesKey = [];
 
     const [moveFolderModalVisible, setMoveFolderModalVisible] = useState(false);
     const allFolders = [];
+
+    const [checkedNotesKey, setCheckedNotesKey] = useState([]);
 
     const onChangeFolderTitle = (inputTitle) => {
         setFolderTitle(inputTitle);
@@ -97,8 +100,8 @@ const HomeScreen = ({route, navigation}) => {
         }
 
         allFolders.length = 0;
-        allFolders.concat(homeFolder);
-        allFolders.concat(childFolders);
+        allFolders.push(homeFolder);
+        allFolders.push(...childFolders);
     };
 
     const loadNoteKeys = () => {
@@ -119,20 +122,6 @@ const HomeScreen = ({route, navigation}) => {
             }
         }
     };
-
-    const NoteItem = ({id, item}) => (
-        <View>
-            <TouchableOpacity
-                onPress={() => navigation.navigate('Note', {noteKey: id, folderKey: homeFolder.key})}
-            >
-                <Text>{item.value.title}</Text>
-            </TouchableOpacity>
-        </View>
-    );
-
-    const renderNotesHomeFolder = ({item}) => (
-        <NoteItem id={item.key} item={item}/>
-    )
 
     const onPressEditFolder = (id) => {
         setEditingFolderKey(id);
@@ -184,12 +173,14 @@ const HomeScreen = ({route, navigation}) => {
     const onPressCheckNote = (id, check) => {
         console.log(id, check);
 
+        // setChekcedNoteKey에서 오류 발생
+
         if(check && !checkedNotesKey.includes(id)){ //체크 시 배열에 없으면
-            checkedNotesKey.push(id);
+            setCheckedNotesKey([...checkedNotesKey, id]);
         } else if(!check && checkedNotesKey.includes(id)) { //체크 해제 시 배열에 있으면
             const tempNotesKey = checkedNotesKey.filter((n) => n !== id);
-            checkedNotesKey.length = 0;
-            tempNotesKey.map(n => checkedNotesKey.push(n));
+            setCheckedNotesKey([]);
+            tempNotesKey.map(n => setCheckedNotesKey([...checkedNotesKey, n]));
         }
 
         console.log(checkedNotesKey);
@@ -197,7 +188,16 @@ const HomeScreen = ({route, navigation}) => {
 
     const moveFolderSelect = (folderKey) => {
         setMoveFolderModalVisible(false);
+
+        console.log("note: ", checkedNotesKey);
         
+        homeFolder.value.noteList = homeFolder.value.noteList.filter((noteKey) => !checkedNotesKey.includes(noteKey));
+
+        const moveFolder = getFolder(folderKey);
+        moveFolder.value.noteList.push(...checkedNotesKey);
+        setCheckedNotesKey([]);
+        setFolder(folderKey, moveFolder);
+        switchRefresh();
     }
 
     useEffect(() => {
@@ -214,8 +214,6 @@ const HomeScreen = ({route, navigation}) => {
 
         makeChildFoldersData();
         makeChildNotesData();
-
-        console.log(notesInHomeFolder);
 
         console.log('home useEffect'); 
 
@@ -284,19 +282,28 @@ const HomeScreen = ({route, navigation}) => {
                 noteDataWithEditable={childNotesData}
                 onPressCheckNote={onPressCheckNote}
             >
+                <MoveFolderModal
+                    allFolders={allFolders}
+                    visible={moveFolderModalVisible}
+                    moveFolderSelect={moveFolderSelect}
+                >
+                </MoveFolderModal>
             </HomeNoteList>
 
-            <MoveFolderModal
-                allFolders={allFolders}
-                visible={moveFolderModalVisible}
-                moveFolderSelect={moveFolderSelect}
-            >
-            </MoveFolderModal>
+            
 
             <EditPressable
                 updateFunc={onPressSwitchEditable}
             >
             </EditPressable>
+
+            <Button
+                title="폴더 이동"
+                onPress={() => {
+                    switchRefresh()
+                    setMoveFolderModalVisible(true)
+                }}
+            />
         </View>
     );
 }

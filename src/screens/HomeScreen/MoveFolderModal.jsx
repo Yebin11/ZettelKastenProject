@@ -5,18 +5,18 @@ import MoveFolderList from "./MoveFolderList";
 
 const MoveFolderModal = ({allFolders = [], visible = false, moveFolderSelect}) => {
     return (
-        <Modal
-            animationType="slide"
-            visible={visible}
-            transparent={false}
-        >
-            <View>
+        <>
+            <Modal
+                animationType="slide"
+                visible={visible}
+                transparent={false}
+            >
                 <MoveFolderList
                     folderData={allFolders}
                     moveFolderSelect={moveFolderSelect}
-                />
-            </View>
-        </Modal>
+                />  
+            </Modal>
+        </>
     );
 }
 

@@ -1,13 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 
-const HomeNoteList = ({ParentScreenProps, parentFolderKey, noteDataWithEditable, onPressCheckNote}) => {
+const HomeNoteList = ({children, ParentScreenProps, parentFolderKey, noteDataWithEditable, onPressCheckNote, allFolders}) => {
     const HomeNoteItem = ({item}) => {
         const [checked, setChecked] = useState(false);
         
         const onPressCheck = () => {
             setChecked(!checked);
         }
+
+        // 이쪽에서 처리를 해줘야 할 듯
+        // useeffect를 빼든 함수를 가져와서 쓰든 해보기
 
         useEffect(() => {
             onPressCheckNote(item.childNote.key, checked);
@@ -47,6 +50,7 @@ const HomeNoteList = ({ParentScreenProps, parentFolderKey, noteDataWithEditable,
 
     return (
         <>
+            {children}
             <FlatList
                 data={noteDataWithEditable}
                 keyExtractor={(item) => item.childNote.key}
