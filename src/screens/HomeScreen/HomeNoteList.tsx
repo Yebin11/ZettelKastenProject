@@ -25,7 +25,7 @@ const HomeNoteList = ({ParentScreenProps, parentFolderKey, noteDataWithEditable,
                     <Text>{item.childNote.value.title}</Text>
                 </Pressable>
 
-                <Pressable
+                {/* <Pressable
                     style={({pressed}) => [
                         {
                             backgroundColor: pressed ? 'rgb(100, 100, 100)' : 'white',
@@ -35,7 +35,7 @@ const HomeNoteList = ({ParentScreenProps, parentFolderKey, noteDataWithEditable,
                     onPress={onPressCheck}
                 >
                     <Text>{checked ? "O" : "X"}</Text>
-                </Pressable>
+                </Pressable> */}
             </View>
         );
     }

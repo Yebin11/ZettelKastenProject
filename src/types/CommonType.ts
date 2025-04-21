@@ -8,7 +8,9 @@ export type RootStackParamList = {
     InFolder: {
         folderKey: string;
     };
-    LinkCheck: undefined;
+    LinkCheck: {
+        noteKey: string;
+    };
     LinkManage: undefined;
     Graph: undefined;
     Search: undefined;

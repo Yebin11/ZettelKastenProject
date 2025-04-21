@@ -6,6 +6,7 @@ import InFolderScreen from "./src/screens/InFolderScreen";
 import { MMKV } from "react-native-mmkv";
 import NoteScreen from "./src/screens/NoteScreen";
 import * as CommonType from "./src/types/CommonType";
+import LinkCheckScreen from "./src/screens/LinkCheckScreen";
 
 const Stack = createNativeStackNavigator<CommonType.RootStackParamList>();
 export const noteStorage = new MMKV({id: 'note-storage'});
@@ -18,6 +19,7 @@ const App = () => {
         <Stack.Screen name="Home" component={HomeScreen}/>
         <Stack.Screen name="InFolder" component={InFolderScreen}/>
         <Stack.Screen name="Note" component={NoteScreen}/>
+        <Stack.Screen name="LinkCheck" component={LinkCheckScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

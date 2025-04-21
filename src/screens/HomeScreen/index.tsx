@@ -290,12 +290,12 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
             >
             </HomeNoteList>
 
-            <MoveFolderModal
+            {/* <MoveFolderModal
                 allFolders={allFolders}
                 visible={moveFolderModalVisible}
                 moveFolderSelect={moveFolderSelect}
             >
-            </MoveFolderModal>
+            </MoveFolderModal> */}
 
             <EditPressable
                 updateFunc={onPressSwitchEditable}
