@@ -11,6 +11,8 @@ import { FolderDataWithEditable, HomeNoteDataWithEditable } from "../../types/Li
 import EditFolderModal from "./EditFolderModal";
 import HomeNoteList from "./HomeNoteList";
 import MoveFolderModal from "./MoveFolderModal";
+import HomeStyle from "./style";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export type HomeScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Home">;
 
@@ -219,48 +221,80 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
         makeChildFoldersData();
         makeChildNotesData();
 
-        console.log(notesInHomeFolder);
-
-        console.log('home useEffect'); 
-
-        //console.log(getNoteAllKeys());
-        //console.log(getFolderAllKeys());
-        //console.log(getFolder('1'));
-        //noteStorage.clearAll();
-
     }, [refresh]);
 
     return (
-        <View>
+        <SafeAreaView>
+            <View style={HomeStyle.header}>
+                <Text style={HomeStyle.appName}>ZettelKasten Project</Text>
+            </View>
+            <View style={HomeStyle.footerBtnContainer}>
+                <TouchableOpacity
+                    style={HomeStyle.footerBtn}
+                    disabled={editable}
+                    onPress={onPressMakeFolder}
+                >
+                    <Text>폴더 생성</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={HomeStyle.footerBtn}
+                    disabled={editable}
+                    onPress={() => navigation.navigate('Note', {noteKey: '', folderKey: '0'})}
+                >
+                    <Text>노트 생성</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={HomeStyle.footerBtn}
+                    onPress={onPressSwitchEditable}
+                >
+                    <Text>편집 {editable ? "끄기" : "켜기"}</Text>
+                </TouchableOpacity>
+            </View>
+
+            <Text style={HomeStyle.sectionBar}>Folder</Text>
             <FolderList
                 ParentScreenProps={{route, navigation}}
                 folderDataWithEditable={childFoldersData}
                 onPressEditFolder={onPressEditFolder}
             >
             </FolderList>
-            
+
+            <Text style={HomeStyle.sectionBar}>Note</Text>
+            <HomeNoteList
+                ParentScreenProps={{route, navigation}}
+                parentFolderKey={homeFolder.key}
+                noteDataWithEditable={childNotesData}
+                onPressCheckNote={onPressCheckNote}
+            >
+            </HomeNoteList>
+
             <View>
                 <Modal
                     animationType="slide"
                     visible={folderTitleModalVisible}
                     transparent={false}
                 >
-                    <View>
+                    <View style={HomeStyle.modal}>
                         <TextInput
                             onChangeText={onChangeFolderTitle}
                             value={folderTitle}
                             placeholder="폴더 제목"
+                            style={HomeStyle.modalInput}
                         />
-                        <TouchableOpacity
-                            onPress={onPressSaveMakeFolder}
-                        >
-                            <Text>저장</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={onPressCancelMakeFolder}
-                        >
-                            <Text>취소</Text>
-                        </TouchableOpacity>
+                        <View style={{flexDirection: 'row'}}>
+                            <TouchableOpacity
+                                onPress={onPressSaveMakeFolder}
+                                style={HomeStyle.modalBtn}
+                            >
+                                <Text style={HomeStyle.modalBtnText}>저장</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={onPressCancelMakeFolder}
+                                style={HomeStyle.modalBtn}
+                            >
+                                <Text style={HomeStyle.modalBtnText}>취소</Text>
+                            </TouchableOpacity>
+                        </View>                        
                     </View>
                 </Modal>
             </View>
@@ -272,36 +306,14 @@ const HomeScreen = ({route, navigation} : HomeScreenProps) => {
                 refreshFunc={switchRefresh}
             >
             </EditFolderModal>
-
-            <Button
-                title="폴더 생성"
-                onPress={onPressMakeFolder}
-            />
-            <Button
-                title="노트 생성"
-                onPress={() => navigation.navigate('Note', {noteKey: '', folderKey: '0'})}
-            />
-
-            <HomeNoteList
-                ParentScreenProps={{route, navigation}}
-                parentFolderKey={homeFolder.key}
-                noteDataWithEditable={childNotesData}
-                onPressCheckNote={onPressCheckNote}
-            >
-            </HomeNoteList>
-
+            
             {/* <MoveFolderModal
                 allFolders={allFolders}
                 visible={moveFolderModalVisible}
                 moveFolderSelect={moveFolderSelect}
             >
             </MoveFolderModal> */}
-
-            <EditPressable
-                updateFunc={onPressSwitchEditable}
-            >
-            </EditPressable>
-        </View>
+        </SafeAreaView>
     );
 }
 

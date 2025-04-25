@@ -1,8 +1,10 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, Button, TouchableOpacity, FlatList } from "react-native";
+import { View, Text, Button, TouchableOpacity, FlatList, Image } from "react-native";
 import { getFolder, getNote, getNoteAllKeys } from "../../storage/storage";
 import * as CommonType from "../../types/CommonType";
+import { SafeAreaView } from "react-native-safe-area-context";
+import InFolderStyle from "./style";
 
 export type InFolderScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "InFolder">;
 
@@ -10,6 +12,7 @@ const InFolderScreen = ({route, navigation} : InFolderScreenProps) => {
     const notesInCurFolder: CommonType.NoteKeyValue[] = [];
     let noteKeys: string[] = [];
     const curFolderKey = route.params.folderKey;
+    const curFolderTitle = getFolder(curFolderKey).value.title;
 
     const loadNoteKeys = () => {
         noteKeys = getNoteAllKeys();
@@ -31,11 +34,13 @@ const InFolderScreen = ({route, navigation} : InFolderScreenProps) => {
     };
 
     const NoteItem = ({id, item}: CommonType.NoteItemProps) => (
-        <View>
+        <View style={InFolderStyle.noteContainer}>
+            <Image source={require('../../assets/note.png')} style={InFolderStyle.icon} resizeMode="contain"/>
             <TouchableOpacity
                 onPress={() => navigation.navigate('Note', {noteKey: id, folderKey: route.params.folderKey})}
+                style={InFolderStyle.noteTitle}
             >
-                <Text>{item.value.title}</Text>
+                <Text style={InFolderStyle.noteTitleText}>{item.value.title}</Text>
             </TouchableOpacity>
         </View>
     );
@@ -52,19 +57,23 @@ const InFolderScreen = ({route, navigation} : InFolderScreenProps) => {
     }, []);
 
     return (
-        <View>
-            <Text>폴더 내부</Text>
+        <SafeAreaView>
+            <View style={InFolderStyle.header}>
+                <Text style={InFolderStyle.folderName}>{curFolderTitle}</Text>
+            </View>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('Note', {noteKey: '', folderKey: route.params.folderKey})}
+                style={InFolderStyle.footerBtn}
+            >
+                <Text>노트 생성</Text>
+            </TouchableOpacity>
             <FlatList
                 data={notesInCurFolder}
                 keyExtractor={(item) => item.key}
                 renderItem={renderNotesInFolder}
             >
             </FlatList>
-            <Button
-                title="노트 생성"
-                onPress={() => navigation.navigate('Note', {noteKey: '', folderKey: route.params.folderKey})}
-            />
-        </View>
+        </SafeAreaView>
     );
 };
 

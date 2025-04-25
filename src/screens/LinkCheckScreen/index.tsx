@@ -1,9 +1,11 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
 import * as CommonType from "../../types/CommonType";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import { getNote, getNoteAllKeys } from "../../storage/storage";
 import LinkedNoteList from "./LinkedNoteList";
+import { SafeAreaView } from "react-native-safe-area-context";
+import LinkStyles from "./style";
 
 export type LinkCheckScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "LinkCheck">;
 
@@ -50,12 +52,16 @@ const LinkCheckScreen = ({route, navigation} : LinkCheckScreenProps) => {
 
 
     return (
-        <>
+        <SafeAreaView>
+            <View style={LinkStyles.header}>
+                <Text style={LinkStyles.noteTitle}>{curNoteKeyValue.value.title}의 링크</Text>
+            </View>
             <LinkedNoteList
                 linkedNotesData={tagwithNoteList}
+                curNoteKeyValue={curNoteKeyValue}
             >
             </LinkedNoteList>
-        </>
+        </SafeAreaView>
     );
 }
 

@@ -3,6 +3,7 @@ import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { delFolder, delNote, getFolder, setFolder } from "../../storage/storage";
 import { FolderKeyValue } from "../../types/CommonType";
 import { EditFolderModalProp } from "../../types/modalType";
+import HomeStyle from "./style";
 
 const EditFolderModal = ({id = '', visible = false, modalOffFunc, refreshFunc}: EditFolderModalProp) => {
     const editingFolder = getFolder(id);
@@ -55,27 +56,42 @@ const EditFolderModal = ({id = '', visible = false, modalOffFunc, refreshFunc}: 
             transparent={false}
             onShow={setPrevFolderTitle}
         >
-            <View>
+            <View style={HomeStyle.modal}>
                 <TextInput
                     onChangeText={onChangeEditingFolderTitle}
                     value={editingFolderTitle}
                     placeholder="새 폴더 제목"
+                    style={HomeStyle.modalInput}
                 />
                 <TouchableOpacity
                     onPress={() => onPressDeleteFolder(editingFolder)}
+                    style={{
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'lightgrey',
+                        borderRadius: 10,
+                        paddingVertical: 15,
+                        paddingHorizontal: 50,
+                    }}
                 >
-                    <Text>삭제</Text>
+                    <Text style={{
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        color: 'darkred',
+                    }}>폴더 삭제</Text>
                 </TouchableOpacity>
-                <View>
+                <View style={{flexDirection: 'row'}}>
                     <TouchableOpacity
                         onPress={() => onPressSaveEditFolder(id, editingFolderTitle)}
+                        style={HomeStyle.modalBtn}
                     >
-                        <Text>저장</Text>
+                        <Text style={HomeStyle.modalBtnText}>저장</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={onPressCancelEditFolder}
+                        style={HomeStyle.modalBtn}
                     >
-                        <Text>취소</Text>
+                        <Text style={HomeStyle.modalBtnText}>취소</Text>
                     </TouchableOpacity>
                 </View>
             </View>

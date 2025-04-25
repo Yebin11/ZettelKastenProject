@@ -4,6 +4,7 @@ import { Button, Pressable, Text, TextInput, TouchableOpacity, View } from "reac
 import { delNote, getFolder, getNote, getNoteAllKeys, setFolder, setNote } from "../../storage/storage";
 import * as CommonType from "../../types/CommonType";
 import noteStyles from "./styles";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export type NoteScreenProps = NativeStackScreenProps<CommonType.RootStackParamList, "Note">;
 
@@ -134,7 +135,7 @@ const NoteScreen = ({route, navigation} : NoteScreenProps) => {
 
         console.log(date.toString());
 
-        return `${date.getFullYear()}-${date.getDate() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     };
 
     const makeSplitTags = () => {
@@ -157,27 +158,54 @@ const NoteScreen = ({route, navigation} : NoteScreenProps) => {
     }, []);
 
     return (
-        <View>
-            <Text>노트 페이지</Text>
-            <TextInput
-                onChangeText={text => {
-                    handleCurNoteChange('title', text);
-                }}
-                value={curNoteKeyValue.value.title}
-                placeholder="제목"
-                editable={editable}
-                selectTextOnFocus={editable}
-            />
-            <Text>{curNoteKeyValue.value.text.length}자</Text>
-            <Text style={[{display: curNoteKeyValue.key === '' ? 'none' : 'flex'}, 
-                noteStyles.date]}
-            >
-                {curNoteKeyValue.value.createdDate}
-            </Text>
-            <Text style={{display: editable ? 'none' : 'flex'}}
-            >
-                {curNoteKeyValue.value.modifiedDate}
-            </Text>
+        <SafeAreaView>
+            <View style={noteStyles.header}>
+                <TextInput
+                    onChangeText={text => {
+                        handleCurNoteChange('title', text);
+                    }}
+                    value={curNoteKeyValue.value.title}
+                    placeholder="제목"
+                    editable={editable}
+                    selectTextOnFocus={editable}
+                    style={noteStyles.noteTitle}
+                />
+            </View>
+            <View style={noteStyles.footerBtnContainer}>
+                <TouchableOpacity
+                    onPress={onPressSaveNote}
+                    style={noteStyles.footerBtn}
+                >
+                    <Text>{editable ? "저장" : "편집"}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={onPressCancelNote}
+                    style={noteStyles.footerBtn}
+                >
+                    <Text>{editable ? "취소" : "삭제"}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('LinkCheck', {noteKey: curNoteKeyValue.key})}
+                    style={[noteStyles.footerBtn, {display: editable ? 'none' : 'flex'}]}
+                >
+                    <Text>{editable ? "" : "링크"}</Text>
+                </TouchableOpacity>
+            </View>
+
+            <Text style={noteStyles.words}>{curNoteKeyValue.value.text.length}자</Text>
+
+            <View style={noteStyles.dateContainer}>
+                <Text style={[{display: curNoteKeyValue.key === '' ? 'none' : 'flex'}, 
+                    noteStyles.date]}
+                >
+                    {curNoteKeyValue.value.createdDate} 생성
+                </Text>
+                <Text style={[{display: editable ? 'none' : 'flex', textAlign: 'right'}, noteStyles.date]}
+                >
+                    {curNoteKeyValue.value.modifiedDate} 수정
+                </Text>
+            </View>
+            
             <TextInput
                 onChangeText={text => {
                     handleCurNoteChange('text', text);
@@ -186,32 +214,21 @@ const NoteScreen = ({route, navigation} : NoteScreenProps) => {
                 placeholder="내용"
                 editable={editable}
                 selectTextOnFocus={editable}
+                multiline={true}
+                style={noteStyles.noteText}
             />
-            <TextInput style={{display: !editable ? 'none' : 'flex'}}
+
+            <TextInput style={[noteStyles.tags, {display: !editable ? 'none' : 'flex'}]}
                 onChangeText={text => {setLongTags(text);}}
                 value={longTags}
                 placeholder="태그"
                 editable={editable}
                 selectTextOnFocus={editable}
             />
-            <Text>{makeNoteTags()}</Text>
+            <Text style={[noteStyles.tags, {display: !editable ? 'flex' : 'none'}]}>{makeNoteTags()}</Text>
 
-            <TouchableOpacity
-                onPress={onPressSaveNote}
-            >
-                <Text>{editable ? "저장" : "편집"}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={onPressCancelNote}
-            >
-                <Text>{editable ? "취소" : "삭제"}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => navigation.navigate('LinkCheck', {noteKey: curNoteKeyValue.key})}
-            >
-                <Text>{editable ? "" : "링크"}</Text>
-            </TouchableOpacity>
-        </View>
+            
+        </SafeAreaView>
     )
 }
 

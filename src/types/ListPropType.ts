@@ -32,4 +32,5 @@ export type MoveFolderListProp = {
 
 export type LinkedNoteListProp = {
     linkedNotesData: TagwithNote[];
+    curNoteKeyValue: NoteKeyValue;
 }

@@ -1,29 +1,28 @@
 import React, { useCallback } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Image, Pressable, Text, View } from "react-native";
 import { FolderDataWithEditable, FolderListProp } from "../../types/ListPropType";
+import HomeStyle from "./style";
 
 const FolderList = ({ParentScreenProps, folderDataWithEditable, onPressEditFolder} : FolderListProp) => {
     const FolderItem = ({item} : {item : FolderDataWithEditable}) => (
-        <View>
+        <View style={HomeStyle.folderContainer}>
+            <Image source={require('../../assets/folder.png')} style={HomeStyle.icon} resizeMode="contain"/>
             <Pressable
+                style={HomeStyle.folderTitle}
                 disabled={item.editable}
                 onPress={() => {
                     ParentScreenProps.navigation.navigate('InFolder', {folderKey: item.childFolder.key})
                 }}
             >
-                <Text>{item.childFolder.value.title}</Text>
+                <Text style={HomeStyle.folderTitleText}>{item.childFolder.value.title}</Text>
             </Pressable>
 
             <Pressable
-                style={({pressed}) => [
-                    {
-                        backgroundColor: pressed ? 'rgb(100, 100, 100)' : 'white',
-                    },
-                ]}
+                style={HomeStyle.folderEditBtn}
                 disabled={!(item.editable)}
                 onPress={() => onPressEditFolder(item.childFolder.key)}
             >
-                <Text>폴더 편집</Text>
+                <Text>편집</Text>
             </Pressable>
         </View>
     );
@@ -37,13 +36,13 @@ const FolderList = ({ParentScreenProps, folderDataWithEditable, onPressEditFolde
     }, []);
 
     return (
-        <>
+        <View style={HomeStyle.listContainer}>
             <FlatList
                 data={folderDataWithEditable}
                 keyExtractor={(item) => item.childFolder.key}
                 renderItem={renderFolder}
             ></FlatList>
-        </>
+        </View>
     )
 };
 

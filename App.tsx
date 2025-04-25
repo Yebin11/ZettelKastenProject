@@ -15,7 +15,7 @@ export const folderStorage = new MMKV({id: 'folder-storage'});
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: false}}>
         <Stack.Screen name="Home" component={HomeScreen}/>
         <Stack.Screen name="InFolder" component={InFolderScreen}/>
         <Stack.Screen name="Note" component={NoteScreen}/>
