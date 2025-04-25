@@ -148,6 +148,8 @@ const NoteScreen = ({route, navigation} : NoteScreenProps) => {
             setEditable(false);
             const noteData = getNote(curNoteKeyValue.key);
             setCurNoteKeyValue(noteData);
+
+            // console.log(noteData);
         }
 
         console.log('note useEffect');

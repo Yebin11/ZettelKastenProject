@@ -45,3 +45,8 @@ export type NoteItemProps = {
     id: string;
     item: NoteKeyValue;
 }
+
+export type TagwithNote = {
+    tag: string;
+    data: NoteKeyValue[];
+}

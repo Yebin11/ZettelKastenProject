@@ -1,6 +1,6 @@
 import { HomeScreenProps } from "../screens/HomeScreen";
 import { InFolderScreenProps } from "../screens/InFolderScreen";
-import { FolderKeyValue, NoteKeyValue } from "./CommonType";
+import { FolderKeyValue, NoteKeyValue, TagwithNote } from "./CommonType";
 
 export type FolderListProp = {
     ParentScreenProps: HomeScreenProps;
@@ -28,4 +28,8 @@ export type HomeNoteDataWithEditable = {
 export type MoveFolderListProp = {
     folderData: FolderKeyValue[];
     moveFolderSelect: Function;
+}
+
+export type LinkedNoteListProp = {
+    linkedNotesData: TagwithNote[];
 }
